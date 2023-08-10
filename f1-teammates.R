@@ -61,56 +61,7 @@ getTeammateTable <- function( driver1 = "Gasly, Pierre" )
 
 }
 
-plotTeammateViz <- function( driver1 = "Gasly, Pierre" )
-{
-  
-  dat1   <- filter(dat,driverName==driver1) %>%
-            mutate(line=0)
-  dat1$plotx <- 1:nrow(dat1)
 
-  driverSurname <- gsub(",.*","",driver1)
-
-  # Function for generating tooltip text
-  tooltipFun <- function(x) {
-    if (is.null(x)) return(NULL)
-    if (is.null(x$x)) return(NULL)
-
-    movie <- dat[dat$x == x$x, ]
-    paste0("<b>", movie$raceName,
-           "</b><br>Year: ", movie$year,
-           "</b><br>Round: ", movie$round,
-           "<br> Team: ", movie$constructorName,
-           "<br> Finishing positions:<br>&emsp;",
-           driverSurname,": ",movie$positionOrder,
-           "<br>&emsp;",gsub(",.*","",movie$Teammate),": ",movie$teammatePosition
-    )
-  }
-
-  vis <- reactive({
-    dat1 %>%
-      ggvis(~yearx, ~relPosition) %>%
-      layer_points(size := 50, size.hover := 200, fill=~Teammate,
-        fillOpacity := 0.7, fillOpacity.hover := 1,
-        shape=~raceWinner, key:=~x) %>%
-      add_tooltip(tooltipFun, "hover") %>%
-      add_axis("x",
-               title = "Year",
-               format="d") %>%
-      add_axis("y", title = "Finishing position relative to teammate") %>%
-      layer_paths(~yearx,~line,stroke:="black",strokeWidth:=3) %>%
-      add_legend( scales = "fill",
-                  orient = "left" ) %>%
-      add_legend( scales = "shape",
-                  title = "Race Winner",
-                  orient = "right",
-                  values = c(driver1,"Teammate","Neither")) %>%
-      set_options(width = 1000, height = 500)
-
-
-  })
-
-  vis %>% bind_shiny("plot")
-}
 
 
 getTeammateData <- function()
